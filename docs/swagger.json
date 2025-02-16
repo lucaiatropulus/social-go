@@ -1,0 +1,766 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "Aici va dau clasa fraierilor",
+        "title": "Iatropulus Social",
+        "termsOfService": "https://google.com",
+        "contact": {
+            "name": "Luca",
+            "url": "https://google.com",
+            "email": "iatropulus.luca@gmail.com"
+        },
+        "license": {
+            "name": "Apache 2.0",
+            "url": "https://google.com"
+        }
+    },
+    "paths": {
+        "/auth/activate/{token}": {
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Activates a user account",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Activates a user account",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "The activation token received via email by the user",
+                        "name": "token",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/auth/login": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Login a user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Login a user",
+                "parameters": [
+                    {
+                        "description": "User login form data",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.LoginRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Token",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/auth/register": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Registers a user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Registers a user",
+                "parameters": [
+                    {
+                        "description": "User registration form data",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.RegisterUserRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "User registered",
+                        "schema": {
+                            "$ref": "#/definitions/models.UserWithToken"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/posts": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Creates a post for the signed in user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "posts"
+                ],
+                "summary": "Creates a post",
+                "parameters": [
+                    {
+                        "description": "CreatePostRequest",
+                        "name": "createPost",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.CreatePostRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Post created",
+                        "schema": {
+                            "$ref": "#/definitions/dao.Post"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/posts/{postID}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Gets a post by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "posts"
+                ],
+                "summary": "Gets a post",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "PostID",
+                        "name": "postID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.DisplayPost"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Deletes a post by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "posts"
+                ],
+                "summary": "Deletes a post",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "PostID",
+                        "name": "postID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            },
+            "patch": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Updates a post by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "posts"
+                ],
+                "summary": "Updates a post",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "PostID",
+                        "name": "postID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "UpdatePost",
+                        "name": "updatePost",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.UpdatePost"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dao.Post"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/users/feed": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Gets the feed of the logged-in user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "Gets the feed of the logged-in user",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "How many items should be returned per page, at least 1, at most 20. Default is 20",
+                        "name": "limit",
+                        "in": "path"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "How many items have already been loaded, min 0. Default is 0",
+                        "name": "offset",
+                        "in": "path"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Describes how the list should be sorted, ASC or DESC. Default is DESC",
+                        "name": "sort",
+                        "in": "path"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Contains the search term. It searches both by title and content of the post",
+                        "name": "search",
+                        "in": "path"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Contains the tags that you want to search by, separated by commas",
+                        "name": "tags",
+                        "in": "path"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filters the posts by the createdAt date and returns only the posts that were created after the given date",
+                        "name": "since",
+                        "in": "path"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filters the posts by the createdAt date and returns only the posts that were created until the given date",
+                        "name": "until",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.DisplayPost"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/users/update": {
+            "patch": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Updates a user profile",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "Updates a user profile",
+                "parameters": [
+                    {
+                        "description": "The update user profile form data",
+                        "name": "updateUserRequest",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.UpdateUserRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dao.User"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/users/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Fetches a user profile by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "Fetches a user profile",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "UserID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dao.User"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/users/{userID}/follow": {
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Follows a user by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "Follows a user",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "UserID",
+                        "name": "userID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "User followed"
+                    },
+                    "400": {
+                        "description": "User not found"
+                    }
+                }
+            }
+        },
+        "/users/{userID}/unfollow": {
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Unfollows a user by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "Unfollows a user",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "UserID",
+                        "name": "userID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "User unfollowed"
+                    },
+                    "400": {
+                        "description": "User not found"
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "dao.Post": {
+            "type": "object",
+            "properties": {
+                "content": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "tags": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "title": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "integer"
+                },
+                "version": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dao.User": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "is_active": {
+                    "type": "boolean"
+                },
+                "role_id": {
+                    "type": "integer"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.CreatePostRequest": {
+            "type": "object",
+            "properties": {
+                "content": {
+                    "type": "string"
+                },
+                "tags": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.DisplayPost": {
+            "type": "object",
+            "properties": {
+                "comments_count": {
+                    "type": "integer"
+                },
+                "content": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "tags": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "title": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "integer"
+                },
+                "username": {
+                    "type": "string"
+                },
+                "version": {
+                    "type": "integer"
+                }
+            }
+        },
+        "models.LoginRequest": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.RegisterUserRequest": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.UpdatePost": {
+            "type": "object",
+            "properties": {
+                "content": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.UpdateUserRequest": {
+            "type": "object",
+            "properties": {
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.UserWithToken": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "is_active": {
+                    "type": "boolean"
+                },
+                "role_id": {
+                    "type": "integer"
+                },
+                "token": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        }
+    },
+    "securityDefinitions": {
+        "ApiKeyAuth": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
+        }
+    }
+}

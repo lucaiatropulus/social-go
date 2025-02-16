@@ -1,0 +1,492 @@
+definitions:
+  dao.Post:
+    properties:
+      content:
+        type: string
+      created_at:
+        type: string
+      id:
+        type: integer
+      tags:
+        items:
+          type: string
+        type: array
+      title:
+        type: string
+      updated_at:
+        type: string
+      user_id:
+        type: integer
+      version:
+        type: integer
+    type: object
+  dao.User:
+    properties:
+      created_at:
+        type: string
+      email:
+        type: string
+      id:
+        type: integer
+      is_active:
+        type: boolean
+      role_id:
+        type: integer
+      username:
+        type: string
+    type: object
+  models.CreatePostRequest:
+    properties:
+      content:
+        type: string
+      tags:
+        items:
+          type: string
+        type: array
+      title:
+        type: string
+    type: object
+  models.DisplayPost:
+    properties:
+      comments_count:
+        type: integer
+      content:
+        type: string
+      created_at:
+        type: string
+      id:
+        type: integer
+      tags:
+        items:
+          type: string
+        type: array
+      title:
+        type: string
+      updated_at:
+        type: string
+      user_id:
+        type: integer
+      username:
+        type: string
+      version:
+        type: integer
+    type: object
+  models.LoginRequest:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    type: object
+  models.RegisterUserRequest:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+      username:
+        type: string
+    type: object
+  models.UpdatePost:
+    properties:
+      content:
+        type: string
+      title:
+        type: string
+    type: object
+  models.UpdateUserRequest:
+    properties:
+      username:
+        type: string
+    type: object
+  models.UserWithToken:
+    properties:
+      created_at:
+        type: string
+      email:
+        type: string
+      id:
+        type: integer
+      is_active:
+        type: boolean
+      role_id:
+        type: integer
+      token:
+        type: string
+      username:
+        type: string
+    type: object
+info:
+  contact:
+    email: iatropulus.luca@gmail.com
+    name: Luca
+    url: https://google.com
+  description: Aici va dau clasa fraierilor
+  license:
+    name: Apache 2.0
+    url: https://google.com
+  termsOfService: https://google.com
+  title: Iatropulus Social
+paths:
+  /auth/activate/{token}:
+    put:
+      consumes:
+      - application/json
+      description: Activates a user account
+      parameters:
+      - description: The activation token received via email by the user
+        in: path
+        name: token
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+      security:
+      - ApiKeyAuth: []
+      summary: Activates a user account
+      tags:
+      - auth
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Login a user
+      parameters:
+      - description: User login form data
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/models.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Token
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal Server Error
+      security:
+      - ApiKeyAuth: []
+      summary: Login a user
+      tags:
+      - auth
+  /auth/register:
+    post:
+      consumes:
+      - application/json
+      description: Registers a user
+      parameters:
+      - description: User registration form data
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/models.RegisterUserRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: User registered
+          schema:
+            $ref: '#/definitions/models.UserWithToken'
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+      security:
+      - ApiKeyAuth: []
+      summary: Registers a user
+      tags:
+      - auth
+  /posts:
+    post:
+      consumes:
+      - application/json
+      description: Creates a post for the signed in user
+      parameters:
+      - description: CreatePostRequest
+        in: body
+        name: createPost
+        required: true
+        schema:
+          $ref: '#/definitions/models.CreatePostRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Post created
+          schema:
+            $ref: '#/definitions/dao.Post'
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+      security:
+      - ApiKeyAuth: []
+      summary: Creates a post
+      tags:
+      - posts
+  /posts/{postID}:
+    delete:
+      consumes:
+      - application/json
+      description: Deletes a post by ID
+      parameters:
+      - description: PostID
+        in: path
+        name: postID
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+      security:
+      - ApiKeyAuth: []
+      summary: Deletes a post
+      tags:
+      - posts
+    get:
+      consumes:
+      - application/json
+      description: Gets a post by ID
+      parameters:
+      - description: PostID
+        in: path
+        name: postID
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.DisplayPost'
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+      security:
+      - ApiKeyAuth: []
+      summary: Gets a post
+      tags:
+      - posts
+    patch:
+      consumes:
+      - application/json
+      description: Updates a post by ID
+      parameters:
+      - description: PostID
+        in: path
+        name: postID
+        required: true
+        type: integer
+      - description: UpdatePost
+        in: body
+        name: updatePost
+        required: true
+        schema:
+          $ref: '#/definitions/models.UpdatePost'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dao.Post'
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+      security:
+      - ApiKeyAuth: []
+      summary: Updates a post
+      tags:
+      - posts
+  /users/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Fetches a user profile by ID
+      parameters:
+      - description: UserID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dao.User'
+        "400":
+          description: Bad Request
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - ApiKeyAuth: []
+      summary: Fetches a user profile
+      tags:
+      - users
+  /users/{userID}/follow:
+    put:
+      consumes:
+      - application/json
+      description: Follows a user by ID
+      parameters:
+      - description: UserID
+        in: path
+        name: userID
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: User followed
+        "400":
+          description: User not found
+      security:
+      - ApiKeyAuth: []
+      summary: Follows a user
+      tags:
+      - users
+  /users/{userID}/unfollow:
+    put:
+      consumes:
+      - application/json
+      description: Unfollows a user by ID
+      parameters:
+      - description: UserID
+        in: path
+        name: userID
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: User unfollowed
+        "400":
+          description: User not found
+      security:
+      - ApiKeyAuth: []
+      summary: Unfollows a user
+      tags:
+      - users
+  /users/feed:
+    get:
+      consumes:
+      - application/json
+      description: Gets the feed of the logged-in user
+      parameters:
+      - description: How many items should be returned per page, at least 1, at most
+          20. Default is 20
+        in: path
+        name: limit
+        type: integer
+      - description: How many items have already been loaded, min 0. Default is 0
+        in: path
+        name: offset
+        type: integer
+      - description: Describes how the list should be sorted, ASC or DESC. Default
+          is DESC
+        in: path
+        name: sort
+        type: string
+      - description: Contains the search term. It searches both by title and content
+          of the post
+        in: path
+        name: search
+        type: string
+      - description: Contains the tags that you want to search by, separated by commas
+        in: path
+        name: tags
+        type: string
+      - description: Filters the posts by the createdAt date and returns only the
+          posts that were created after the given date
+        in: path
+        name: since
+        type: string
+      - description: Filters the posts by the createdAt date and returns only the
+          posts that were created until the given date
+        in: path
+        name: until
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.DisplayPost'
+            type: array
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+      security:
+      - ApiKeyAuth: []
+      summary: Gets the feed of the logged-in user
+      tags:
+      - users
+  /users/update:
+    patch:
+      consumes:
+      - application/json
+      description: Updates a user profile
+      parameters:
+      - description: The update user profile form data
+        in: body
+        name: updateUserRequest
+        required: true
+        schema:
+          $ref: '#/definitions/models.UpdateUserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dao.User'
+        "400":
+          description: Bad Request
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      security:
+      - ApiKeyAuth: []
+      summary: Updates a user profile
+      tags:
+      - users
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

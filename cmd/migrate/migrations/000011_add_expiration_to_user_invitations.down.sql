@@ -1,0 +1,1 @@
+ALTER TABLE user_invitations DROP COLUMN expiration_date;
