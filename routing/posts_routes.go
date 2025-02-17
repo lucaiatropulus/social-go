@@ -13,8 +13,14 @@ func (routing *Routing) configurePostsRouting(r chi.Router) {
 			r.Use(routing.middleware.PostsPathParamMiddleware)
 
 			r.Get("/", routing.handlers.PostHandler.GetPostHandler)
-			r.Patch("/", routing.middleware.CheckPostOwnershipMiddleware(moderatorRole, routing.handlers.PostHandler.UpdatePostHandler))
-			r.Delete("/", routing.middleware.CheckPostOwnershipMiddleware(adminRole, routing.handlers.PostHandler.DeletePostHandler))
+			r.Patch("/", routing.middleware.CheckPostOwnershipMiddleware(
+				routing.roles.moderatorRole,
+				routing.handlers.PostHandler.UpdatePostHandler,
+			))
+			r.Delete("/", routing.middleware.CheckPostOwnershipMiddleware(
+				routing.roles.adminRole,
+				routing.handlers.PostHandler.DeletePostHandler,
+			))
 		})
 	})
 }

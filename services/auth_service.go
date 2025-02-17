@@ -31,19 +31,19 @@ func (s *AuthService) RegisterUser(w http.ResponseWriter, r *http.Request) {
 	var payload models.RegisterUserRequest
 
 	if err := utils.ReadJSON(w, r, &payload); err != nil {
-		responses.BadRequest(w, r, err, "The register information is not valid", s.app.Logger)
+		responses.BadRequest(w, r, err, "The register information is not valid")
 		return
 	}
 
 	if ok := payload.IsValid(); !ok {
-		responses.BadRequest(w, r, errors.New("register data invalid"), "The register information is not valid", s.app.Logger)
+		responses.BadRequest(w, r, errors.New("register data invalid"), "The register information is not valid")
 		return
 	}
 
 	userRole, err := s.app.Store.Roles.GetRoleByName(r.Context(), "user")
 
 	if err != nil {
-		responses.InternalServerError(w, r, err, s.app.Logger)
+		responses.InternalServerError(w, r, err)
 		return
 	}
 
@@ -54,7 +54,7 @@ func (s *AuthService) RegisterUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := user.Password.Set(payload.Password); err != nil {
-		responses.InternalServerError(w, r, err, s.app.Logger)
+		responses.InternalServerError(w, r, err)
 		return
 	}
 
@@ -68,7 +68,7 @@ func (s *AuthService) RegisterUser(w http.ResponseWriter, r *http.Request) {
 	err = s.app.Store.Users.CreateAndInvite(ctx, user, hashedToken, s.app.Config.Mail.Expiration)
 
 	if err != nil {
-		responses.InternalServerError(w, r, err, s.app.Logger)
+		responses.InternalServerError(w, r, err)
 		return
 	}
 
@@ -92,15 +92,15 @@ func (s *AuthService) RegisterUser(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 
 		if err := s.app.Store.Users.Delete(ctx, user.ID); err != nil {
-			s.app.Logger.Errorw("Error deleting user", "error", err)
+			utils.GetLogger().Errorw("Error deleting user", "error", err)
 		}
 
-		responses.InternalServerError(w, r, err, s.app.Logger)
+		responses.InternalServerError(w, r, err)
 		return
 	}
 
 	if err := responses.JSONResponse(w, http.StatusCreated, userWithToken); err != nil {
-		responses.InternalServerError(w, r, err, s.app.Logger)
+		responses.InternalServerError(w, r, err)
 		return
 	}
 }
@@ -109,12 +109,12 @@ func (s *AuthService) LoginUser(w http.ResponseWriter, r *http.Request) {
 	var payload models.LoginRequest
 
 	if err := utils.ReadJSON(w, r, &payload); err != nil {
-		responses.BadRequest(w, r, err, "Your credentials could not be identified", s.app.Logger)
+		responses.BadRequest(w, r, err, "Your credentials could not be identified")
 		return
 	}
 
 	if ok := payload.IsValid(); !ok {
-		responses.BadRequest(w, r, errors.New("error validating login payload"), "Your credentials could not be identified", s.app.Logger)
+		responses.BadRequest(w, r, errors.New("error validating login payload"), "Your credentials could not be identified")
 		return
 	}
 
@@ -123,22 +123,22 @@ func (s *AuthService) LoginUser(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		switch {
 		case errors.Is(err, store.ErrNotFound):
-			responses.Unauthorized(w, r, s.app.Logger)
+			responses.Unauthorized(w, r)
 		default:
-			responses.InternalServerError(w, r, err, s.app.Logger)
+			responses.InternalServerError(w, r, err)
 		}
 		return
 	}
 
 	if ok := user.Password.CheckPassword(payload.Password); !ok {
-		responses.Unauthorized(w, r, s.app.Logger)
+		responses.Unauthorized(w, r)
 		return
 	}
 
 	validDuration, ok := utils.ParseStringToDuration(s.app.Config.Auth.ValidDuration)
 
 	if !ok {
-		responses.InternalServerError(w, r, errors.New("auth valid duration configuration is malformed"), s.app.Logger)
+		responses.InternalServerError(w, r, errors.New("auth valid duration configuration is malformed"))
 		return
 	}
 
@@ -154,12 +154,12 @@ func (s *AuthService) LoginUser(w http.ResponseWriter, r *http.Request) {
 	token, err := s.app.Authenticator.GenerateToken(claims)
 
 	if err != nil {
-		responses.InternalServerError(w, r, err, s.app.Logger)
+		responses.InternalServerError(w, r, err)
 		return
 	}
 
 	if err := responses.JSONResponse(w, http.StatusOK, token); err != nil {
-		responses.InternalServerError(w, r, err, s.app.Logger)
+		responses.InternalServerError(w, r, err)
 		return
 	}
 }
@@ -172,9 +172,9 @@ func (s *AuthService) ActivateAccount(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		switch err {
 		case store.ErrNotFound:
-			responses.BadRequest(w, r, err, "We were unable to activate the account", s.app.Logger)
+			responses.BadRequest(w, r, err, "We were unable to activate the account")
 		default:
-			responses.InternalServerError(w, r, err, s.app.Logger)
+			responses.InternalServerError(w, r, err)
 		}
 
 		return

@@ -5,12 +5,12 @@ import (
 	"github.com/lucaiatropulus/social/cmd/main/application"
 	"github.com/lucaiatropulus/social/cmd/main/lifecycle"
 	"github.com/lucaiatropulus/social/config"
+	"github.com/lucaiatropulus/social/internal/utils"
 	"github.com/lucaiatropulus/social/routing"
 
 	"github.com/lucaiatropulus/social/internal/rate_limiter"
 	"github.com/lucaiatropulus/social/internal/store"
 	"github.com/lucaiatropulus/social/internal/store/cache"
-	"go.uber.org/zap"
 )
 
 //	@title			Iatropulus Social
@@ -32,7 +32,7 @@ func main() {
 	environment := flag.String("env", "development", "Defines the environment")
 	configuration := config.LoadConfig(environment)
 
-	logger := zap.Must(zap.NewProduction()).Sugar()
+	logger := utils.GetLogger()
 	defer logger.Sync()
 
 	database := setupDatabase(configuration, logger)

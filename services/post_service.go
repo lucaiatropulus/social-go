@@ -23,12 +23,12 @@ func (s *PostService) CreatePost(w http.ResponseWriter, r *http.Request) {
 	var payload models.CreatePostRequest
 
 	if err := utils.ReadJSON(w, r, &payload); err != nil {
-		responses.BadRequest(w, r, err, "Nu am putut genera", s.app.Logger)
+		responses.BadRequest(w, r, err, "Nu am putut genera")
 		return
 	}
 
 	if reason, isValid := payload.IsValid(); !isValid {
-		responses.BadRequest(w, r, nil, reason, s.app.Logger)
+		responses.BadRequest(w, r, nil, reason)
 		return
 	}
 
@@ -37,12 +37,12 @@ func (s *PostService) CreatePost(w http.ResponseWriter, r *http.Request) {
 	post := models.CreatePostFromPayload(payload, user.ID)
 
 	if err := s.app.Store.Posts.Create(r.Context(), post); err != nil {
-		responses.InternalServerError(w, r, err, s.app.Logger)
+		responses.InternalServerError(w, r, err)
 		return
 	}
 
 	if err := responses.JSONResponse(w, http.StatusCreated, post); err != nil {
-		responses.InternalServerError(w, r, err, s.app.Logger)
+		responses.InternalServerError(w, r, err)
 		return
 	}
 }
@@ -53,14 +53,14 @@ func (s *PostService) GetPost(w http.ResponseWriter, r *http.Request) {
 	commentsCount, err := s.app.Store.Comments.GetCountByID(r.Context(), post.ID)
 
 	if err != nil {
-		responses.InternalServerError(w, r, err, s.app.Logger)
+		responses.InternalServerError(w, r, err)
 		return
 	}
 
 	user, err := s.app.Store.Users.GetByID(r.Context(), post.UserID)
 
 	if err != nil {
-		responses.InternalServerError(w, r, err, s.app.Logger)
+		responses.InternalServerError(w, r, err)
 		return
 	}
 
@@ -71,7 +71,7 @@ func (s *PostService) GetPost(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := responses.JSONResponse(w, http.StatusOK, postWithComments); err != nil {
-		responses.InternalServerError(w, r, err, s.app.Logger)
+		responses.InternalServerError(w, r, err)
 		return
 	}
 }
@@ -82,24 +82,24 @@ func (s *PostService) UpdatePost(w http.ResponseWriter, r *http.Request) {
 	var payload models.UpdatePost
 
 	if err := utils.ReadJSON(w, r, &payload); err != nil {
-		responses.BadRequest(w, r, err, "We were unable to save the changes", s.app.Logger)
+		responses.BadRequest(w, r, err, "We were unable to save the changes")
 		return
 	}
 
 	if isValid := payload.IsValid(); !isValid {
-		responses.BadRequest(w, r, nil, "You need to change at least one of the fields", s.app.Logger)
+		responses.BadRequest(w, r, nil, "You need to change at least one of the fields")
 		return
 	}
 
 	payload.SetUpdatedContent(post)
 
 	if err := s.app.Store.Posts.Update(r.Context(), post); err != nil {
-		responses.InternalServerError(w, r, err, s.app.Logger)
+		responses.InternalServerError(w, r, err)
 		return
 	}
 
 	if err := responses.JSONResponse(w, http.StatusOK, post); err != nil {
-		responses.InternalServerError(w, r, err, s.app.Logger)
+		responses.InternalServerError(w, r, err)
 		return
 	}
 }
@@ -110,9 +110,9 @@ func (s *PostService) DeletePost(w http.ResponseWriter, r *http.Request) {
 	if err := s.app.Store.Posts.Delete(r.Context(), post.ID); err != nil {
 		switch {
 		case errors.Is(err, store.ErrNotFound):
-			responses.NotFound(w, r, err, s.app.Logger)
+			responses.NotFound(w, r, err)
 		default:
-			responses.InternalServerError(w, r, err, s.app.Logger)
+			responses.InternalServerError(w, r, err)
 		}
 		return
 	}

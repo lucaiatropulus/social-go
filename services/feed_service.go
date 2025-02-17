@@ -27,12 +27,12 @@ func (s *FeedService) GetUserFeed(w http.ResponseWriter, r *http.Request) {
 	fq, err := fq.Parse(r)
 
 	if err != nil {
-		responses.BadRequest(w, r, err, "We were unable to deliver the feed", s.app.Logger)
+		responses.BadRequest(w, r, err, "We were unable to deliver the feed")
 		return
 	}
 
 	if ok := fq.IsValid(); !ok {
-		responses.BadRequest(w, r, errors.New("nu e ok"), "We were unable to deliver the feed", s.app.Logger)
+		responses.BadRequest(w, r, errors.New("nu e ok"), "We were unable to deliver the feed")
 		return
 	}
 
@@ -41,12 +41,12 @@ func (s *FeedService) GetUserFeed(w http.ResponseWriter, r *http.Request) {
 	feed, err := s.app.Store.Feed.GetUserFeed(r.Context(), user.ID, fq)
 
 	if err != nil {
-		responses.InternalServerError(w, r, err, s.app.Logger)
+		responses.InternalServerError(w, r, err)
 		return
 	}
 
 	if err := responses.JSONResponse(w, http.StatusOK, feed); err != nil {
-		responses.InternalServerError(w, r, err, s.app.Logger)
+		responses.InternalServerError(w, r, err)
 		return
 	}
 }

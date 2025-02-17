@@ -1,7 +1,15 @@
 package routing
 
-const (
-	userRole      = "user"
-	moderatorRole = "moderator"
-	adminRole     = "admin"
-)
+type roles struct {
+	userRole      string
+	moderatorRole string
+	adminRole     string
+}
+
+func initRoles() *roles {
+	return &roles{
+		userRole:      "user",
+		moderatorRole: "moderator",
+		adminRole:     "admin",
+	}
+}

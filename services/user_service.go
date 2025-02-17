@@ -27,15 +27,15 @@ func (s *UserService) GetUser(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		switch {
 		case errors.Is(err, store.ErrNotFound):
-			responses.NotFound(w, r, err, s.app.Logger)
+			responses.NotFound(w, r, err)
 		default:
-			responses.InternalServerError(w, r, err, s.app.Logger)
+			responses.InternalServerError(w, r, err)
 		}
 		return
 	}
 
 	if err := responses.JSONResponse(w, http.StatusOK, user); err != nil {
-		responses.InternalServerError(w, r, err, s.app.Logger)
+		responses.InternalServerError(w, r, err)
 	}
 }
 
@@ -44,14 +44,14 @@ func (s *UserService) UpdateUser(w http.ResponseWriter, r *http.Request) {
 	var payload models.UpdateUserRequest
 
 	if err := utils.ReadJSON(w, r, &payload); err != nil {
-		responses.BadRequest(w, r, err, "The info you sent are invalid", s.app.Logger)
+		responses.BadRequest(w, r, err, "The info you sent are invalid")
 		return
 	}
 
 	payload.UpdateUser(user)
 
 	if err := s.app.Store.Users.Update(r.Context(), user); err != nil {
-		responses.InternalServerError(w, r, err, s.app.Logger)
+		responses.InternalServerError(w, r, err)
 		return
 	}
 
@@ -60,7 +60,7 @@ func (s *UserService) UpdateUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := responses.JSONResponse(w, http.StatusOK, user); err != nil {
-		responses.InternalServerError(w, r, err, s.app.Logger)
+		responses.InternalServerError(w, r, err)
 		return
 	}
 }
@@ -72,10 +72,10 @@ func (s *UserService) FollowUser(w http.ResponseWriter, r *http.Request) {
 	if err := s.app.Store.Followers.Follow(r.Context(), followedUserID, authenticatedUser.ID); err != nil {
 		switch {
 		case errors.Is(err, store.ErrFollowConflict):
-			responses.Conflict(w, r, err, s.app.Logger)
+			responses.Conflict(w, r, err)
 			return
 		default:
-			responses.InternalServerError(w, r, err, s.app.Logger)
+			responses.InternalServerError(w, r, err)
 			return
 		}
 	}
@@ -88,7 +88,7 @@ func (s *UserService) UnfollowUser(w http.ResponseWriter, r *http.Request) {
 	authenticatedUser := middleware.GetAuthenticatedUserFromCtx(r)
 
 	if err := s.app.Store.Followers.Unfollow(r.Context(), unfollowedUserID, authenticatedUser.ID); err != nil {
-		responses.InternalServerError(w, r, err, s.app.Logger)
+		responses.InternalServerError(w, r, err)
 		return
 	}
 

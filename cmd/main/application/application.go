@@ -14,7 +14,6 @@ type Application struct {
 	Config        config.Config
 	Store         store.Storage
 	Cache         cache.Storage
-	Logger        *zap.SugaredLogger
 	Mailer        mailer.Client
 	Authenticator auth.Authenticator
 	RateLimiter   ratelimiter.Limiter
@@ -25,7 +24,6 @@ func NewApplication(config config.Config, store store.Storage, cache cache.Stora
 		Config:        config,
 		Store:         store,
 		Cache:         cache,
-		Logger:        logger,
 		Mailer:        mailer,
 		Authenticator: authenticator,
 		RateLimiter:   rateLimiter,

@@ -16,7 +16,7 @@ func NewHealthService(app *application.Application) *HealthService {
 
 func (s *HealthService) CheckAppHealth(w http.ResponseWriter, r *http.Request) {
 	if err := responses.JSONResponse(w, http.StatusOK, "Ok"); err != nil {
-		responses.InternalServerError(w, r, err, s.app.Logger)
+		responses.InternalServerError(w, r, err)
 		return
 	}
 }
