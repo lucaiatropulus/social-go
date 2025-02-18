@@ -1,0 +1,123 @@
+version: '3.8'
+
+services:
+
+  proxy:
+    image: my_private.registry:5000/proxy-server:latest
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints: [node.role == manager]
+      update_config:
+        order: start-first
+        failure_action: rollback
+      restart_policy:
+        condition: any
+        delay: 5s
+        max_attempts: 3
+        window: 60s
+    init: true
+    networks:
+      - proxy
+    depends_on:
+      - db
+    ports:
+      - "80:8080"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "localhost:1000/isAlive"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+
+  social-server:
+    image: my_private.registry:5000/social-server:latest
+    deploy:
+      mode: replicated
+      replicas: 2
+      update_config:
+        parallelism: 1
+        delay: 10s
+        order: start-first
+        failure_action: rollback
+      restart_policy:
+        condition: any
+        delay: 5s
+        max_attempts: 3
+        window: 60s
+    init: true
+    environment:
+      - ENVIRONMENT=iasi
+      - DATABASE_URL_FILE=/run/secrets/database-url
+    secrets:
+      - database-url
+    networks:
+      - internal
+    depends_on:
+      - db
+      - proxy
+    healthcheck:
+      test: [ "CMD", "/healthcheck" ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+
+  db:
+    image: postgres:16.3
+    container_name: postgres-db
+    deploy:
+      placement:
+        constraints: [ node.role == manager ]
+      restart_policy:
+        condition: any
+        delay: 5s
+        max_attempts: 3
+        window: 60s
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD_FILE=/run/secrets/postgres-passwd
+    secrets:
+      - postgres-passwd
+    networks:
+      - internal
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:6.2-alpine
+    restart: unless-stopped
+    container_name: redis-social
+    ports:
+      - '6379:6379'
+    command: redis-server --save 60 1 --loglevel warning
+
+  redis-commander:
+    container_name: redis-commander
+    hostname: redis-commander
+    image: rediscommander/redis-commander:latest
+    environment:
+    - REDIS_HOST=redis
+    ports:
+      - "127.0.0.1:8081:8081"
+    depends_on:
+      - redis
+
+
+volumes:
+  pgdata:
+networks:
+  proxy:
+    driver: overlay
+  internal:
+secrets:
+  database-url:
+    external: true
+  postgres-passwd:
+    external: true
